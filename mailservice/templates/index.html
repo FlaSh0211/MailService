@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <title>excel to mail</title>
+  </head>
+  <body>
+    <div class="jumbotron jumbotron-fluid" style="height: 340px">
+      <div class="container">
+        <h1 class="display-4">Mail</h1>
+        <p class="lead"> © Copyright (2019 09 06) (Seung Cheol Nam) All rights reserved</p>
+      </div>
+      <div>
+          <form action="{%url 'upload'%}" method="POST" enctype="multipart/form-data">
+            {%csrf_token%}
+            <br><br>
+            <div>
+                  <input type='file' name='files' id = 'isfile' accept='.xlsx, .csv, .xls' style="background: white; margin-left: 100px;">
+                  <button type="submit" class="btn btn-outline-primary" onclick="isFile(event)">업로드</button>
+                  <a class="btn btn-outline-danger" href="{%url 'delete'%}" role="button">삭제</a>
+                  
+                  <a class="btn btn-outline-dark" href="{%url 'sendAll'%}" role="button">일괄전송</a>
+                  <a href="https://mail.naver.com/"class= "btn btn-success btn-sm" style="margin-left:100px;">네이버 메일</a>
+            </div>
+            <br>
+          </form>
+          <br>
+        </div>
+    </div>
+
+    <div>
+        <b> 전송실패:</b><b id="fails"> &nbsp 없음 </b>   
+    </div>
+
+    <div>
+      <div><table class="table table-hover" >
+        <thead class="thead-dark">
+          <tr>
+            <th scope="col">기업</th>
+            <th scope="col">주문상품</th>
+            <th scope="col">수량</th>
+            <th scope="col">이메일</th>
+          </tr>
+        </thead>
+        <tbody>
+            
+            {%for i, k in data2%}
+            
+            <tr>
+              <td><b>{{i}}</b></td>
+              
+                    <td> {%for j in data%}
+                            {%if j.company == i and j.emails == k%}
+                              * {{j.product_name}}<br>
+                            {%endif%}
+                          {%endfor%}
+                    </td>
+                    <td> {%for j in data %}
+                        {%if j.company == i and j.emails == k%}
+                          * {{j.count}}<br>
+                        {%endif%}
+                      {%endfor%}
+                  </td>
+                  <td> {%for j in data%}
+                    {%if j.company == i and j.emails == k%}
+                      * {{j.emails}}<br>
+                    {%endif%}
+                    
+                  {%endfor%}
+                  <form action="{%url 'sendEmail'%}" method="POST" enctype="multipart/form-data">
+                    {%csrf_token%}
+                    <br>
+                    <button class="btn btn-outline-success"  >메일보내기</button>
+                    <input type="hidden" value = "{{k}}" name='email'>
+                </form>
+                  </td>
+            </tr>
+            {%endfor%}
+           
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script>
+        var message = {{message}};
+        var fail = {{fail}};
+        function isFile(e){
+            var isfile = document.getElementById('isfile').value;
+            if(isfile.length <=0){
+              alert('파일을 첨부해 주세요');
+              e.preventDefault();
+            } 
+        };
+
+        
+
+        window.onload = function (){
+  
+              if(message){
+                alert(message.toString());
+                
+                if(fail !="")
+                  document.getElementById("fails").innerHTML = fail;
+            };
+          
+        };
+
+    </script>
+      </div>
+    </body>
+</html>
